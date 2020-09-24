@@ -1,87 +1,151 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class VoxelShapes : MonoBehaviour
 {
     // Start is called before the first frame update
-    [SerializeField] private Vector3 center = Vector3.zero;
-    [SerializeField] private float radius = 0f;
-    [SerializeField] private int nbBox = 0;
     [SerializeField] private GameObject cube = null;
+    [SerializeField] private Vector3[] centers;
+    [SerializeField] private float[] radius;
+    [SerializeField] private int nbBox = 0;
+    [SerializeField] private bool union;
 
-    private Vector3[] vertices;
-    private bool rdy = false;
     private List<Cube> cubes;
+    private Sphere[] spheres;
+
+    private bool rdy = false;
 
     void Start()
     {
         cubes = new List<Cube>();
+        CreateSpheres();
 
-        CreateBox(radius * 2, nbBox);
+        CreateBox(spheres, nbBox);
+
+        rdy = true;
     }
 
-    void CreateBox(float length, int nbBox)
+    void CreateSpheres()
     {
-        float step = length / nbBox; // size of cube
+        Assert.IsTrue(centers.Length == radius.Length);
+        spheres = new Sphere[centers.Length];
+
+        for(int i = 0; i < spheres.Length; i++)
+        {
+            spheres[i] = new Sphere(centers[i], radius[i]);
+        }
+    }
+
+    void CreateBox(Sphere[] spheres, int nbBox)
+    {
+        float x = Mathf.Infinity;
+        float y = Mathf.Infinity;
+        float z = Mathf.Infinity;
+        float xMax = Mathf.NegativeInfinity;
+        float yMax = Mathf.NegativeInfinity;
+        float zMax = Mathf.NegativeInfinity;
+
+        for(int w = 0; w < spheres.Length; w++)
+        {
+            float r = spheres[w].GetRadius();
+            float[] coords = GetCoordsFromVector(spheres[w].GetCenter());
+
+            if (coords[0] - r < x) x = coords[0] - r;
+            if (coords[0] + r > xMax) xMax = coords[0] + r;
+
+            if (coords[1] - r < y) y = coords[1] - r;
+            if (coords[1] + r > yMax) yMax = coords[1] + r;
+
+            if (coords[2] - r < z) z = coords[2] - r;
+            if (coords[2] + r > zMax) zMax = coords[2] + r;
+        }
+
+        float step = GetLengthFrom(new Vector3(x, y, z), new Vector3(xMax, yMax, zMax)) / nbBox; // size of cube
         float offset = step / 2; // offset to get center of cube
 
-        int vLength = (int)Mathf.Pow((nbBox + 1), 3);
-        Debug.Log(vLength);
-        vertices = new Vector3[vLength];
+        Debug.Log(new Vector3(x, y, z));
+        Debug.Log(new Vector3(xMax, yMax, zMax));
 
-        float x, xMax, y, yMax, z, zMax;
-        x = center.x - radius + offset;
-        y = center.y - radius + offset;
-        z = center.z - radius + offset;
-        xMax = center.x + radius - offset;
-        yMax = center.y + radius - offset;
-        zMax = center.z + radius - offset;
+        x += offset;
+        y += offset;
+        z += offset;
+        xMax -= offset;
+        yMax -= offset;
+        zMax -= offset;
 
-        int a = 0;
-        for(float i = x; i <= xMax; i += step)
+        for (float i = x; i <= xMax; i += step)
         {
-            for(float j = y; j <= yMax; j += step)
+            for (float j = y; j <= yMax; j += step)
             {
-                for(float k = z; k <= zMax; k += step)
+                for (float k = z; k <= zMax; k += step)
                 {
-                    vertices[a] = new Vector3(i, j, k);
-                    Cube c = new Cube(vertices[a], offset);
+                    Cube c = new Cube(new Vector3(i, j, k));
                     cubes.Add(c);
-                    //GameObject go = Instantiate(cube, vertices[a], Quaternion.identity);
-                    //go.transform.localScale = new Vector3(step, step, step);
-                    //Debug.Log(a + " " + vertices[a]);
-                    a++;
                 }
             }
         }
 
-        DrawCubes(step);
-
-        rdy = true;
+        if(union)
+        {
+            DrawCubesUnion(step);
+        }
+        else
+        {
+            DrawCubesIntersect(step);
+        }
 
     }
 
-    void DrawCubes(float step)
+    float GetLengthFrom(Vector3 min, Vector3 max)
     {
-        foreach(Cube c in cubes)
+        float length = Mathf.Max((max.x - min.x),(max.y - min.y),(max.z - min.z));
+        return length;
+    }
+
+    float[] GetCoordsFromVector(Vector3 v)
+    {
+        float[] coords = new float[3];
+        coords[0] = v.x;
+        coords[1] = v.y;
+        coords[2] = v.z;
+        return coords;
+    }
+
+    void DrawCubesUnion(float step)
+    {
+        foreach (Cube c in cubes)
         {
-            if(c.IsInSphere(radius))
+            if (c.UnionWithSpheres(centers, radius))
             {
                 GameObject go = Instantiate(cube, c.GetCenter(), Quaternion.identity);
                 go.transform.localScale = new Vector3(step, step, step);
+                go.transform.SetParent(transform);
+            }
+        }
+    }
+    void DrawCubesIntersect(float step)
+    {
+        foreach (Cube c in cubes)
+        {
+            if (c.IntersectWithSpheres(centers, radius))
+            {
+                GameObject go = Instantiate(cube, c.GetCenter(), Quaternion.identity);
+                go.transform.localScale = new Vector3(step, step, step);
+                go.transform.SetParent(transform);
             }
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        if(rdy)
-        {
-            for(int i = 0; i < vertices.Length; i++)
-            {
-                Gizmos.DrawSphere(vertices[i], 0.2f);
-            }
-        }
-    }
+    //void OnDrawGizmos()
+    //{
+    //    if(rdy)
+    //    {
+    //        foreach(Cube c in cubes)
+    //        {
+    //            Gizmos.DrawSphere(c.GetCenter(), 0.05f);
+    //        }
+    //    }
+    //}
 }

@@ -164,10 +164,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4f7620222689564a93f111829108378, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0, z: 0}
-  radius: 5
-  nbBox: 100
   cube: {fileID: 910506261}
+  centers:
+  - {x: 0, y: 0, z: 0}
+  - {x: 2, y: 0, z: 0}
+  radius:
+  - 1
+  - 1
+  nbBox: 50
+  union: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
