@@ -22,22 +22,22 @@ public class ImplicitSurfaces : MonoBehaviour
         CreateCubes();
         CreateSpheres();
         rdy = true;
-
-        DrawCubes();
     }
 
     // Update is called once per frame
     void Update()
     {
+        InputSettings();
     }
 
     void InputSettings()
     {
-        if(Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(KeyCode.A)) 
         {
             DrawCubes(true);
         }
-        else if(Input.GetKeyDown(KeyCode.L))
+
+        if(Input.GetKeyDown(KeyCode.B))
         {
             DrawCubes(false);
         }
@@ -68,6 +68,7 @@ public class ImplicitSurfaces : MonoBehaviour
                 {
                     RemovePotentialToCube(c, spheres[k].GetPotentialToAdd(c.GetCenter()));
                 }
+                //Debug.Log(c.GetPotential());
                 if (c.GetPotential() > threshold)
                 {
                     c.SetDraw(true);
@@ -81,13 +82,13 @@ public class ImplicitSurfaces : MonoBehaviour
     {
         cubes = new List<Cube>(); 
 
-        for(int i = 1; i <= nbCubesPerRows; i++)
+        for(int i = 0; i < nbCubesPerRows; i++)
         {
-            for(int j = 1; j <= nbCubesPerRows; j++)
+            for(int j = 0; j < nbCubesPerRows; j++)
             {
-                for(int k = 1; k <= nbCubesPerRows; k++)
+                for(int k = 0; k < nbCubesPerRows; k++)
                 {
-                    cubes.Add(new Cube(new Vector3(i, j, k) * offset));
+                    cubes.Add(new Cube(new Vector3(i, j, k) + new Vector3(offset, offset, offset)));
                 }
             }
         }
@@ -112,9 +113,10 @@ public class ImplicitSurfaces : MonoBehaviour
         {
             foreach(Cube c in cubes)
             {
-                if(c.GetDraw())
+                if (c.GetDraw())
                 {
-                    Gizmos.DrawSphere(c.GetCenter(), 0.05f);
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawCube(c.GetCenter(), new Vector3(1, 1, 1));
                 }
             }
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sphere : MonoBehaviour
+public class Sphere
 {
     private float radius;
     private Vector3 center;
@@ -24,7 +24,10 @@ public class Sphere : MonoBehaviour
     public int GetPotentialToAdd(Vector3 cubePosition)
     {
         float dstFromCenter = (cubePosition - center).magnitude;
-        return (int)(potentialOnCenter * radius - dstFromCenter);
+        int p = (int)(potentialOnCenter - dstFromCenter);
+
+        p = p < 0 ? 0 : p;
+        return p;
     }
 
     public Vector3 GetCenter()
