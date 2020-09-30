@@ -21,6 +21,12 @@ public class Sphere : MonoBehaviour
         this.potentialOnCenter = potentialOnCenter;
     }
 
+    public int GetPotentialToAdd(Vector3 cubePosition)
+    {
+        float dstFromCenter = (cubePosition - center).magnitude;
+        return (int)(potentialOnCenter * radius - dstFromCenter);
+    }
+
     public Vector3 GetCenter()
     {
         return center;

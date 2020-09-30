@@ -31,14 +31,44 @@ public class ImplicitSurfaces : MonoBehaviour
     {
     }
 
-    void DrawCubes()
+    void InputSettings()
+    {
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            DrawCubes(true);
+        }
+        else if(Input.GetKeyDown(KeyCode.L))
+        {
+            DrawCubes(false);
+        }
+    }
+
+    void AddPotentialToCube(Cube c, int p)
+    {
+        c.SetPotential(c.GetPotential() + p);
+    }
+
+    void RemovePotentialToCube(Cube c, int p)
+    {
+        c.SetPotential(c.GetPotential() - p);
+    }
+
+    void DrawCubes(bool add)
     {
         foreach(Cube c in cubes)
         {
             int k = 0;
             while(!c.GetDraw() && k < spheres.Length)
             {
-                if (c.IsInSphere(spheres[k].GetCenter(), spheres[k].GetRadius()))
+                if(add)
+                {
+                    AddPotentialToCube(c, spheres[k].GetPotentialToAdd(c.GetCenter()));
+                }
+                else
+                {
+                    RemovePotentialToCube(c, spheres[k].GetPotentialToAdd(c.GetCenter()));
+                }
+                if (c.GetPotential() > threshold)
                 {
                     c.SetDraw(true);
                 }
