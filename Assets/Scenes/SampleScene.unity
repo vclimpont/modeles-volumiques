@@ -244,12 +244,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cubeObject: {fileID: 117146525}
-  nbCubesPerRows: 20
-  threshold: 5
+  nbCubesPerRows: 50
+  threshold: 20
   centers:
-  - {x: 10, y: 10, z: 10}
+  - {x: 20, y: 20, z: 20}
+  - {x: 30, y: 30, z: 30}
+  - {x: 35, y: 10, z: 10}
   radius:
-  - 5
+  - 15
+  - 10
+  - 10
 --- !u!1 &524532520
 GameObject:
   m_ObjectHideFlags: 0
