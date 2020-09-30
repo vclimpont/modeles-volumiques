@@ -6,17 +6,20 @@ public class Cube
 {
     private Vector3 center;
     private int potential;
+    private bool draw;
 
     public Cube(Vector3 center)
     {
         this.center = center;
         potential = 0;
+        draw = false;
     }
 
     public Cube(Vector3 center, int potential)
     {
         this.center = center;
         this.potential = potential;
+        draw = false;
     }
 
     public bool IsInSphere(Vector3 sCenter, float radius)
@@ -67,5 +70,15 @@ public class Cube
     public int GetPotential()
     {
         return potential;
+    }
+
+    public void SetDraw(bool _draw)
+    {
+        draw = _draw;
+    }
+
+    public bool GetDraw()
+    {
+        return draw;
     }
 }

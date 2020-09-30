@@ -243,7 +243,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a57004d2042fd34c9e1d7cba8131cd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nbCubesPerRows: 20
+  nbCubesPerRows: 50
+  threshold: 50
+  centers:
+  - {x: 1, y: 1, z: 1}
+  - {x: 5, y: 5, z: 5}
+  - {x: 10, y: 10, z: 10}
+  - {x: 15, y: 15, z: 15}
+  - {x: 20, y: 20, z: 20}
+  radius:
+  - 1
+  - 2
+  - 1
+  - 1
+  - 2
+  potentialOnCenters:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!1 &524532520
 GameObject:
   m_ObjectHideFlags: 0
