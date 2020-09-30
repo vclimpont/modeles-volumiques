@@ -5,10 +5,18 @@ using UnityEngine;
 public class Cube
 {
     private Vector3 center;
+    private int potential;
 
     public Cube(Vector3 center)
     {
         this.center = center;
+        potential = 0;
+    }
+
+    public Cube(Vector3 center, int potential)
+    {
+        this.center = center;
+        this.potential = potential;
     }
 
     public bool IsInSphere(Vector3 sCenter, float radius)
@@ -49,5 +57,15 @@ public class Cube
     public Vector3 GetCenter()
     {
         return center;
+    }
+
+    public void SetPotential(int _potential)
+    {
+        potential = _potential;
+    }
+
+    public int GetPotential()
+    {
+        return potential;
     }
 }
