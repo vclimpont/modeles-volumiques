@@ -243,13 +243,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a57004d2042fd34c9e1d7cba8131cd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cubeObject: {fileID: 117146525}
   nbCubesPerRows: 20
   threshold: 5
   centers:
   - {x: 10, y: 10, z: 10}
   radius:
-  - 5
-  potentialOnCenters:
   - 5
 --- !u!1 &524532520
 GameObject:

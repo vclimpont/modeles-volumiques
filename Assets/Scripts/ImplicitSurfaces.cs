@@ -4,21 +4,25 @@ using UnityEngine;
 
 public class ImplicitSurfaces : MonoBehaviour
 {
+    [SerializeField] GameObject cubeObject = null;
     [SerializeField] private int nbCubesPerRows;
     [SerializeField] private int threshold;
     [SerializeField] private Vector3[] centers;
     [SerializeField] private float[] radius;
-    [SerializeField] private float[] potentialOnCenters;
 
     private List<Cube> cubes;
+    private Dictionary<Vector3, GameObject> cubeObjectsAtPosition;
     private Sphere[] spheres;
     private float offset = 0.5f;
 
     private bool rdy = false;
+    private bool add = false;
+    private bool remove = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        cubeObjectsAtPosition = new Dictionary<Vector3, GameObject>();
         CreateCubes();
         CreateSpheres();
         rdy = true;
@@ -34,12 +38,20 @@ public class ImplicitSurfaces : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A)) 
         {
-            DrawCubes(true);
+            add = true;
+        }
+        else
+        {
+            add = false;
         }
 
-        if(Input.GetKeyDown(KeyCode.B))
+        if(Input.GetKeyDown(KeyCode.E))
         {
-            DrawCubes(false);
+            remove = true;
+        }
+        else
+        {
+            remove = false;
         }
     }
 
@@ -58,7 +70,7 @@ public class ImplicitSurfaces : MonoBehaviour
         foreach(Cube c in cubes)
         {
             int k = 0;
-            while(!c.GetDraw() && k < spheres.Length)
+            while(k < spheres.Length)
             {
                 if(add)
                 {
@@ -69,9 +81,21 @@ public class ImplicitSurfaces : MonoBehaviour
                     RemovePotentialToCube(c, spheres[k].GetPotentialToAdd(c.GetCenter()));
                 }
                 //Debug.Log(c.GetPotential());
-                if (c.GetPotential() > threshold)
+                if (c.GetPotential() >= threshold && !c.GetDraw())
                 {
                     c.SetDraw(true);
+                    GameObject cube = Instantiate(cubeObject, c.GetCenter(), Quaternion.identity);
+                    cubeObjectsAtPosition.Add(c.GetCenter(), cube);
+                }
+                else if(c.GetPotential() < threshold && c.GetDraw())
+                {
+                    c.SetDraw(false);
+                    GameObject cube;
+                    if(cubeObjectsAtPosition.TryGetValue(c.GetCenter(), out cube))
+                    {
+                        cubeObjectsAtPosition.Remove(c.GetCenter());
+                        Destroy(cube);
+                    }
                 }
                 k++;
             }
@@ -97,12 +121,12 @@ public class ImplicitSurfaces : MonoBehaviour
 
     void CreateSpheres()
     {
-        UnityEngine.Assertions.Assert.IsTrue(centers.Length == radius.Length && centers.Length == potentialOnCenters.Length);
+        UnityEngine.Assertions.Assert.IsTrue(centers.Length == radius.Length);
         spheres = new Sphere[centers.Length];
 
         for (int i = 0; i < spheres.Length; i++)
         {
-            spheres[i] = new Sphere(centers[i], radius[i], potentialOnCenters[i]);
+            spheres[i] = new Sphere(centers[i], radius[i]);
         }
     }
 
@@ -111,13 +135,14 @@ public class ImplicitSurfaces : MonoBehaviour
     {
         if(rdy)
         {
-            foreach(Cube c in cubes)
+           if(add)
             {
-                if (c.GetDraw())
-                {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawCube(c.GetCenter(), new Vector3(1, 1, 1));
-                }
+                DrawCubes(true);
+            }
+
+           if(remove)
+            {
+                DrawCubes(false);
             }
         }
     }
